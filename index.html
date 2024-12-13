@@ -20,11 +20,40 @@
             border: none;
         }
     </style>
-    <!-- Config and Main Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/main.js" defer></script>
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="Compez's Art">
+    <meta property="og:description" content="In the realm of artistic creation, the computer becomes my canvas, and code, my brush. With each stroke of programming, I intricately weave the threads of imagination, transforming abstract ideas into tangible visual wonders.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://compez.art/frame">
+    <meta property="og:image" content="https://compez.art/frame/assets/frame-splash.jpg">
+    <meta property="og:image:alt" content="Compez's Art">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="600">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Twitter Metadata -->
+    <meta name="twitter:image" content="https://compez.art/frame/assets/frame-splash.jpg">
+    <meta name="twitter:image:alt" content="Compez's Art">
+    <meta name="twitter:image:width" content="800">
+    <meta name="twitter:image:height" content="600">
+    <meta name="twitter:image:type" content="image/png">
+
+    <!-- Frame Metadata -->
+    <meta name="fc:frame" content='{"version":"next","imageUrl":"https://compez.art/frame/assets/frame-splash.jpg","button":{"title":"Launch Compez\'s Site","action":{"type":"launch_frame","name":"Compez\'s Art","url":"https://compez.art/frame","splashImageUrl":"https://compez.art/frame/assets/favicon-192.png","splashBackgroundColor":"#ffffff"}}}'>
+
+    <!-- Farcaster SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk/dist/index.min.js"></script>
 </head>
 <body>
-    <iframe id="main-frame" title="Main content frame"></iframe>
+    <iframe id="main-frame" src="https://compez.art" title="Compez's Art" aria-label="Main content frame"></iframe>
 </body>
+<script>
+    // Wait for the iframe to fully load before signaling readiness
+    document.getElementById('main-frame').addEventListener('load', () => {
+        if (window.frame && window.frame.sdk && window.frame.sdk.actions) {
+            window.frame.sdk.actions.ready();
+        }
+    });
+</script>
 </html>
