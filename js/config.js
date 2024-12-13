@@ -1,14 +1,14 @@
 const config = {
-    appUrl: "https://8000-ankatan-simplefc-bjos93r9bcm.ws-eu117.gitpod.io",
-    targetUrl: "https://8000-ankatan-simplefc-bjos93r9bcm.ws-eu117.gitpod.io",
+    appUrl: "https://compez.art/frame",
+    targetUrl: "https://compez.art",
     frame: {
         version: "next",
         imageUrl: "/assets/frame-splash.jpg",
         button: {
-            title: "Aluisyo's Site",
+            title: "Launch Compez's Site",
             action: {
                 type: "launch_frame",
-                name: "Aluisyo Linktree",
+                name: "Compez's Art",
                 url: "",
                 splashImageUrl: "/assets/favicon-192.png",
                 splashBackgroundColor: "#ffffff"
@@ -23,15 +23,15 @@ const config = {
     },
     metadata: {
         openGraph: {
-            title: "Aluisyo's Site",
+            title: "Compez's Art",
             description: "In the realm of artistic creation, the computer becomes my canvas, and code, my brush. With each stroke of programming, I intricately weave the threads of imagination, transforming abstract ideas into tangible visual wonders.",
-            imageAlt: "Aluisyo's Site",
+            imageAlt: "Compez's Art",
             imageWidth: "800",
             imageHeight: "600",
             imageType: "image/png"
         },
         twitter: {
-            imageAlt: "Aluisyo's Site",
+            imageAlt: "Compez's Art",
             imageWidth: "800",
             imageHeight: "600",
             imageType: "image/png"

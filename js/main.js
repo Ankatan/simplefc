@@ -1,75 +1,111 @@
-// Update frame metadata on page load
-document.addEventListener('DOMContentLoaded', () => {
-    // Sanitize URLs exactly like PHP version
-    const appUrl = new URL(config.appUrl || '', window.location.href).toString();
-    const targetUrl = new URL(config.targetUrl || '', window.location.href).toString();
+// Function to generate metadata
+function generateMetadata() {
+    const frame = config.frame;
+    frame.imageUrl = config.appUrl + frame.imageUrl;
+    frame.button.action.url = config.appUrl;
+    frame.button.action.splashImageUrl = config.appUrl + frame.button.action.splashImageUrl;
 
-    // Default values like PHP version
-    const defaultMetadata = {
-        title: 'Default Title',
-        description: 'Default Description'
+    const metadata = {
+        title: config.metadata.openGraph.title,
+        openGraph: {
+            ...config.metadata.openGraph,
+            url: config.appUrl,
+            image: frame.imageUrl
+        },
+        twitter: {
+            ...config.metadata.twitter,
+            image: frame.imageUrl
+        },
+        other: {
+            'fc:frame': JSON.stringify(frame)
+        }
     };
 
-    // Process URLs exactly like PHP version
-    const frame = {...config.frame};
-    frame.imageUrl = appUrl + frame.imageUrl;
-    frame.button.action.url = appUrl;
-    frame.button.action.splashImageUrl = appUrl + frame.button.action.splashImageUrl;
+    return metadata;
+}
 
-    // Generate metadata exactly like PHP version
-    const generateMetadata = (frame, config, appUrl) => {
-        const imageUrl = frame.imageUrl;
-        return {
-            title: config.metadata?.openGraph?.title || defaultMetadata.title,
-            openGraph: {
-                ...(config.metadata?.openGraph || {}),
-                url: appUrl,
-                image: imageUrl
-            },
-            twitter: {
-                ...(config.metadata?.twitter || {}),
-                image: imageUrl
-            },
-            other: {
-                'fc:frame': JSON.stringify(frame)
+// Function to set meta tags
+function setMetaTags(metadata) {
+    // Set title
+    document.title = metadata.title;
+
+    // Set Open Graph meta tags
+    const ogTags = {
+        'og:title': metadata.openGraph.title,
+        'og:description': metadata.openGraph.description,
+        'og:type': 'website',
+        'og:url': metadata.openGraph.url,
+        'og:image': metadata.openGraph.image,
+        'og:image:alt': metadata.openGraph.imageAlt,
+        'og:image:width': metadata.openGraph.imageWidth,
+        'og:image:height': metadata.openGraph.imageHeight,
+        'og:image:type': metadata.openGraph.imageType
+    };
+
+    // Set Twitter meta tags
+    const twitterTags = {
+        'twitter:image': metadata.twitter.image,
+        'twitter:image:alt': metadata.twitter.imageAlt,
+        'twitter:image:width': metadata.twitter.imageWidth,
+        'twitter:image:height': metadata.twitter.imageHeight,
+        'twitter:image:type': metadata.twitter.imageType
+    };
+
+    // Set Frame meta tag
+    const frameTags = {
+        'fc:frame': metadata.other['fc:frame']
+    };
+
+    // Function to set or create meta tag
+    const setMetaTag = (name, content, property = false) => {
+        let meta = document.querySelector(`meta[${property ? 'property' : 'name'}="${name}"]`);
+        if (!meta) {
+            meta = document.createElement('meta');
+            if (property) {
+                meta.setAttribute('property', name);
+            } else {
+                meta.setAttribute('name', name);
             }
-        };
+            document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
     };
 
-    const metadata = generateMetadata(frame, config, appUrl);
-    const fcTag = metadata.other['fc:frame'].replace(/"/g, '&quot;');
+    // Set all meta tags
+    Object.entries(ogTags).forEach(([key, value]) => setMetaTag(key, value, true));
+    Object.entries(twitterTags).forEach(([key, value]) => setMetaTag(key, value));
+    Object.entries(frameTags).forEach(([key, value]) => setMetaTag(key, value));
+}
 
-    // Update metadata tags exactly like PHP output
-    document.querySelector('title').textContent = metadata.openGraph.title;
-    document.querySelector('meta[property="og:title"]').content = metadata.openGraph.title;
-    document.querySelector('meta[property="og:description"]').content = metadata.openGraph.description;
-    document.querySelector('meta[property="og:url"]').content = metadata.openGraph.url;
-    document.querySelector('meta[property="og:image"]').content = metadata.openGraph.image;
-    document.querySelector('meta[property="og:image:alt"]').content = metadata.openGraph.imageAlt;
-    document.querySelector('meta[property="og:image:width"]').content = metadata.openGraph.imageWidth;
-    document.querySelector('meta[property="og:image:height"]').content = metadata.openGraph.imageHeight;
-    document.querySelector('meta[property="og:image:type"]').content = metadata.openGraph.imageType;
+// Function to initialize the page
+function initializePage() {
+    // Generate metadata
+    const metadata = generateMetadata();
+    
+    // Set meta tags
+    setMetaTags(metadata);
 
-    document.querySelector('meta[name="twitter:image"]').content = metadata.twitter.image;
-    document.querySelector('meta[name="twitter:image:alt"]').content = metadata.twitter.imageAlt;
-    document.querySelector('meta[name="twitter:image:width"]').content = metadata.twitter.imageWidth;
-    document.querySelector('meta[name="twitter:image:height"]').content = metadata.twitter.imageHeight;
-    document.querySelector('meta[name="twitter:image:type"]').content = metadata.twitter.imageType;
+    // Set iframe source
+    const mainFrame = document.getElementById('main-frame');
+    mainFrame.src = config.targetUrl;
+    mainFrame.setAttribute('title', metadata.openGraph.title);
+    mainFrame.setAttribute('aria-label', 'Main content frame');
 
-    document.querySelector('meta[name="fc:frame"]').content = fcTag;
+    // Load Farcaster SDK
+    if (config.cdn['farcaster-sdk']) {
+        const script = document.createElement('script');
+        script.src = config.cdn['farcaster-sdk'];
+        script.onload = () => {
+            // Wait for the iframe to fully load before signaling readiness
+            mainFrame.addEventListener('load', () => {
+                if (window.frame && window.frame.sdk && window.frame.sdk.actions) {
+                    window.frame.sdk.actions.ready();
+                }
+            });
+        };
+        document.body.appendChild(script);
+    }
+}
 
-    // Update second title tag and iframe title
-    document.querySelector('head > title:last-of-type').textContent = metadata.title;
-    document.getElementById('main-frame').title = metadata.openGraph.title;
-
-    // Update SDK script source and iframe src with fallbacks like PHP
-    const cdn = config.cdn || {};
-    const fcsdk = cdn['farcaster-sdk'] || '';
-    document.querySelector('script:not([src*="js/"])').src = fcsdk;
-    document.getElementById('main-frame').src = targetUrl;
-
-    // Wait for the iframe to fully load before signaling readiness
-    document.getElementById('main-frame').addEventListener('load', () => {
-        frame.sdk.actions.ready();
-    });
-});
+// Initialize when the DOM is loaded
+document.addEventListener('DOMContentLoaded', initializePage);
