@@ -1,6 +1,6 @@
 const config = {
-    appUrl: "https://ar-io.dev/Xj-PFsKveBvs6nNIYYJFzlCl2Ti3PFgTnQV-kFP0hQM",
-    targetUrl: "https://ar-io.dev/Xj-PFsKveBvs6nNIYYJFzlCl2Ti3PFgTnQV-kFP0hQM",
+    appUrl: "https://8000-ankatan-simplefc-bjos93r9bcm.ws-eu117.gitpod.io",
+    targetUrl: "https://8000-ankatan-simplefc-bjos93r9bcm.ws-eu117.gitpod.io",
     frame: {
         version: "next",
         imageUrl: "/assets/frame-splash.jpg",
